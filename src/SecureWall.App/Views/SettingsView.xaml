@@ -87,8 +87,9 @@
                         <Button Content="{Binding UpdateInstallText}" Command="{Binding InstallUpdateCommand}" Style="{StaticResource PrimaryButton}"
                                 IsEnabled="{Binding UpdateBusy, Converter={StaticResource InvBool}}" Visibility="{Binding UpdateAvailable, Converter={StaticResource BoolToVis}}"/>
                     </WrapPanel>
-                    <ProgressBar Minimum="0" Maximum="1" Value="{Binding UpdateProgress}" Height="6" Margin="0,10,0,0" Visibility="{Binding UpdateBusy, Converter={StaticResource BoolToVis}}"/>
-                    <TextBlock Text="{Binding UpdateStatus}" TextWrapping="Wrap" Margin="0,10,0,0"/>
+                    <ProgressBar Minimum="0" Maximum="1" Value="{Binding UpdateProgress}" IsIndeterminate="{Binding UpdateIndeterminate}" Height="6" Margin="0,10,0,0" Visibility="{Binding UpdateBusy, Converter={StaticResource BoolToVis}}"/>
+                    <ctl:MessageBar Text="{Binding UpdateStatus}" Level="{Binding UpdateLevel}" Margin="0,10,0,0"/>
+                    <TextBlock Text="{Binding UpdateLastCheck}" Style="{StaticResource Muted}" Margin="0,6,0,0"/>
                     <TextBlock Text="{Binding UpdateNotes}" TextWrapping="Wrap" Style="{StaticResource Muted}" Margin="0,6,0,0"/>
                 </StackPanel>
             </Border>

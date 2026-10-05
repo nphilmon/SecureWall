@@ -53,9 +53,10 @@ public class ReleaseNotesTests
     {
         foreach (var f in ReleaseNotes.All.SelectMany(e => e.Features).Where(f => f.Page != null))
             Assert.True(Enum.IsDefined(f.Page!.Value));
-        var current = ReleaseNotes.All[0].Features.Where(f => f.Page != null).Select(f => f.Page!.Value).ToList();
-        Assert.Contains(AppPage.Map, current);
-        Assert.Contains(AppPage.Dns, current);
+        // Les pages Carte et DNS sont les nouveautés de la 2.0.1 : leurs notes doivent y renvoyer.
+        var v201 = ReleaseNotes.For("2.0.1")!.Features.Where(f => f.Page != null).Select(f => f.Page!.Value).ToList();
+        Assert.Contains(AppPage.Map, v201);
+        Assert.Contains(AppPage.Dns, v201);
     }
 
     [Theory]

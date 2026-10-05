@@ -135,7 +135,7 @@ Publication complète (application + service, autonome, x64) puis installateur :
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File installer\build-installer.ps1
-# → publish\SecureWall-Setup-2.0.1.exe
+# → publish\SecureWall-Setup-2.0.2.exe
 # Publication seule : ... build-installer.ps1 -SkipInstaller   → publish\SecureWall\
 ```
 

@@ -17,6 +17,16 @@ public static class ReleaseNotes
 
     public static readonly IReadOnlyList<ReleaseEntry> All = new[]
     {
+        new ReleaseEntry("2.0.2", "5 octobre 2026", "Mises à jour plus claires et désinstallation fiable", new ReleaseFeature[]
+        {
+            new(Improved, "Recherche de mise à jour plus lisible",
+                "Un indicateur animé s'affiche pendant la recherche, le résultat est coloré (vert : à jour, bleu : nouvelle version, rouge : erreur) et l'heure de la dernière vérification est indiquée à chaque clic, même si le résultat ne change pas.",
+                AppPage.Settings, "Ouvrir les paramètres"),
+            new(Improved, "Adresse des mises à jour préremplie",
+                "L'adresse officielle du manifeste signé (dépôt GitHub du projet) est proposée par défaut : plus rien à saisir. Seule la recherche reste à votre initiative."),
+            new(Fixed, "Désinstallation complète",
+                "SecureWall et son service sont fermés avant la suppression des fichiers. Auparavant, une application restée dans la zone de notification pouvait laisser le dossier d'installation sur le disque."),
+        }),
         new ReleaseEntry("2.0.1", "5 octobre 2026", "Cartes, DNS, mode urgence et mises à jour", new ReleaseFeature[]
         {
             new(New, "Carte des connexions",

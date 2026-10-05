@@ -7,7 +7,7 @@
 ;   - ne modifie AUCUN paramètre de sécurité : ni Microsoft Defender, ni le pare-feu, ni exclusion, ni certificat (il n'installe aucun certificat sur votre PC).
 
 #define AppName "SecureWall Security"
-#define AppVersion "2.0.1"
+#define AppVersion "2.0.2"
 #define AppExe "SecureWall.exe"
 #define ServiceExe "SecureWall.PrivilegedService.exe"
 #define ServiceName "SecureWallPrivilegedService"

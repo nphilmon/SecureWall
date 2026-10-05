@@ -483,6 +483,9 @@ public sealed partial class SettingsViewModel : PageViewModel
     // Mise à jour de l'application
     [ObservableProperty] private string _updateUrl = "";
     [ObservableProperty] private string _updateStatus = "";
+    [ObservableProperty] private Level _updateLevel = Level.Neutral;
+    [ObservableProperty] private string _updateLastCheck = "";
+    [ObservableProperty] private bool _updateIndeterminate;   // recherche (durée inconnue) ; faux pendant le téléchargement, qui a un pourcentage
     [ObservableProperty] private string _updateNotes = "";
     [ObservableProperty] private bool _updateAvailable;
     [ObservableProperty] private bool _updateBusy;
@@ -538,14 +541,16 @@ public sealed partial class SettingsViewModel : PageViewModel
     [RelayCommand]
     async Task CheckUpdateAsync()
     {
-        if (string.IsNullOrWhiteSpace(UpdateUrl)) { UpdateStatus = "Saisissez l'adresse du manifeste de mise à jour."; return; }
+        if (string.IsNullOrWhiteSpace(UpdateUrl)) { UpdateStatus = "Saisissez l'adresse du manifeste de mise à jour."; UpdateLevel = Level.Warning; return; }
         try
         {
-            UpdateBusy = true; UpdateAvailable = false; UpdateNotes = ""; _pendingUpdate = null; OnPropertyChanged(nameof(UpdateInstallText));
-            UpdateStatus = "Recherche en cours…";
+            UpdateBusy = true; UpdateIndeterminate = true; UpdateAvailable = false; UpdateNotes = ""; _pendingUpdate = null; OnPropertyChanged(nameof(UpdateInstallText));
+            UpdateStatus = "Recherche en cours…"; UpdateLevel = Level.Info;
             _settings.Current.AppUpdateUrl = UpdateUrl.Trim(); _settings.Save();
             var r = await _updates.CheckAsync(UpdateUrl.Trim());
             UpdateStatus = r.Message;
+            // Vert : à jour ; bleu : nouvelle version ; rouge : recherche impossible ou manifeste refusé.
+            UpdateLevel = r.Manifest != null ? Level.Info : r.UpToDate ? Level.Good : Level.Bad;
             if (r.Manifest is { } m)
             {
                 _pendingUpdate = m; UpdateAvailable = true;
@@ -553,8 +558,12 @@ public sealed partial class SettingsViewModel : PageViewModel
                 OnPropertyChanged(nameof(UpdateInstallText));
             }
         }
-        catch (Exception ex) { AppLog.Error(ex, "Recherche de mise à jour"); UpdateStatus = "Recherche impossible : " + ex.Message; }
-        finally { UpdateBusy = false; }
+        catch (Exception ex) { AppLog.Error(ex, "Recherche de mise à jour"); UpdateStatus = "Recherche impossible : " + ex.Message; UpdateLevel = Level.Bad; }
+        finally
+        {
+            UpdateBusy = false; UpdateIndeterminate = false;
+            UpdateLastCheck = "Dernière vérification : " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");   // change à chaque clic, même si le résultat est identique
+        }
     }
 
     [RelayCommand]
@@ -567,21 +576,21 @@ public sealed partial class SettingsViewModel : PageViewModel
         try
         {
             _installerLock?.Dispose(); _installerLock = null;   // libère un installateur déjà préparé avant d'en télécharger un autre
-            UpdateBusy = true; UpdateProgress = 0; UpdateStatus = "Téléchargement en cours…";
+            UpdateBusy = true; UpdateIndeterminate = false; UpdateProgress = 0; UpdateStatus = "Téléchargement en cours…"; UpdateLevel = Level.Info;
             var dir = Path.Combine(SecureWall.Infrastructure.Configuration.AppPaths.UserDataDir, "updates");
             var (path, msg) = await _updates.DownloadAsync(m, dir, new Progress<double>(p => UpdateProgress = p));
-            UpdateStatus = msg;
+            UpdateStatus = msg; UpdateLevel = path == null ? Level.Bad : Level.Good;
             if (path == null) return;
             // Verrou + contrôle final : le fichier ne peut plus être remplacé entre ici et son exécution avec élévation.
             var (locked, lockMsg) = _updates.OpenVerified(path, m);
-            if (locked == null) { UpdateStatus = lockMsg; return; }
+            if (locked == null) { UpdateStatus = lockMsg; UpdateLevel = Level.Bad; return; }
             _installerLock = locked;
             _audit.Write("Mise à jour de l'application", $"Lancement de l'installateur {m.Version}");
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(path) { UseShellExecute = true, Verb = "runas" });
             UpdateStatus = "Installateur lancé. Suivez l'assistant ; SecureWall se fermera pour la mise à jour si nécessaire.";
         }
-        catch (System.ComponentModel.Win32Exception) { UpdateStatus = "Installation annulée (autorisation Windows refusée)."; }
-        catch (Exception ex) { AppLog.Error(ex, "Installation de la mise à jour"); UpdateStatus = "Échec : " + ex.Message; }
+        catch (System.ComponentModel.Win32Exception) { UpdateStatus = "Installation annulée (autorisation Windows refusée)."; UpdateLevel = Level.Warning; }
+        catch (Exception ex) { AppLog.Error(ex, "Installation de la mise à jour"); UpdateStatus = "Échec : " + ex.Message; UpdateLevel = Level.Bad; }
         finally { UpdateBusy = false; }
     }
 

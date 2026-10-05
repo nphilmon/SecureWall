@@ -55,10 +55,10 @@ if (-not $NoSign) {
 }
 & $iscc @isccArgs (Join-Path $PSScriptRoot "SecureWall.iss")
 if ($LASTEXITCODE -ne 0) { throw "Échec d'Inno Setup" }
-Write-Host "Installateur : $(Join-Path $root 'publish\SecureWall-Setup-2.0.1.exe')" -ForegroundColor Green
+Write-Host "Installateur : $(Join-Path $root 'publish\SecureWall-Setup-2.0.2.exe')" -ForegroundColor Green
 
 if (-not $NoSign) {
-    $setup = Join-Path $root 'publish\SecureWall-Setup-2.0.1.exe'
+    $setup = Join-Path $root 'publish\SecureWall-Setup-2.0.2.exe'
     $sig = Get-AuthenticodeSignature $setup
     Write-Host ("Signature de l'installateur : {0} — {1}" -f $sig.Status, $sig.SignerCertificate.Subject) -ForegroundColor Green
 }
