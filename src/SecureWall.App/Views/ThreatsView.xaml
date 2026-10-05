@@ -1,0 +1,57 @@
+<UserControl x:Class="SecureWall.App.Views.ThreatsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctl="clr-namespace:SecureWall.App.Controls"
+             Style="{StaticResource PageStyle}">
+    <Grid Margin="28,6,28,20">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+        <ctl:PageHeader Title="{Binding Title}" Subtitle="{Binding Subtitle}">
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Traiter les menaces actives" Command="{Binding TreatActiveCommand}" Style="{StaticResource DangerButton}" Visibility="{Binding ActiveCount, Converter={StaticResource CountToVis}}"/>
+                <Button Content="Actualiser" Command="{Binding RefreshCommand}"/>
+                <Button Content="Windows Security" Command="{Binding OpenWindowsSecurityCommand}" Margin="0"/>
+            </StackPanel>
+        </ctl:PageHeader>
+        <ctl:MessageBar Grid.Row="1" Text="{Binding Message}" Level="{Binding MessageLevel}"/>
+
+        <DockPanel Grid.Row="2" Margin="0,0,0,10" LastChildFill="False">
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                <RadioButton Style="{StaticResource Pill}" GroupName="tf" Content="Tout" IsChecked="True" Checked="OnFilter" Tag="all"/>
+                <RadioButton Style="{StaticResource Pill}" GroupName="tf" Content="Actif" Checked="OnFilter" Tag="active"/>
+                <RadioButton Style="{StaticResource Pill}" GroupName="tf" Content="Supprimé" Checked="OnFilter" Tag="removed"/>
+                <RadioButton Style="{StaticResource Pill}" GroupName="tf" Content="Bloqué" Checked="OnFilter" Tag="blocked"/>
+                <RadioButton Style="{StaticResource Pill}" GroupName="tf" Content="Quarantaine" Checked="OnFilter" Tag="quarantine"/>
+                <RadioButton Style="{StaticResource Pill}" GroupName="tf" Content="Autorisé" Checked="OnFilter" Tag="allowed"/>
+            </StackPanel>
+            <TextBox Tag="Rechercher une menace" DockPanel.Dock="Right" Width="260" Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Rechercher une menace" ToolTip="Rechercher (nom, fichier, processus, catégorie)"/>
+        </DockPanel>
+
+        <Grid Grid.Row="3">
+            <DataGrid ItemsSource="{Binding Items}" SelectedItem="{Binding Selected}" AutomationProperties.Name="Historique des menaces">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Menace" Binding="{Binding Name}" Width="2*" MinWidth="230" ElementStyle="{StaticResource CellText}"/>
+                    <DataGridTextColumn Header="Catégorie" Binding="{Binding Category}" Width="150" MinWidth="150" ElementStyle="{StaticResource CellText}"/>
+                    <DataGridTemplateColumn Header="Gravité" Width="100" MinWidth="100" SortMemberPath="SeverityId">
+                        <DataGridTemplateColumn.CellTemplate><DataTemplate><ctl:StatusBadge Text="{Binding Severity}" Level="{Binding SeverityLevel}"/></DataTemplate></DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Fichier" Binding="{Binding FilePath}" Width="3*" MinWidth="260" ElementStyle="{StaticResource CellText}"/>
+                    <DataGridTextColumn Header="Processus" Binding="{Binding Process}" Width="200" MinWidth="200" ElementStyle="{StaticResource CellText}"/>
+                    <DataGridTextColumn Header="Date" Binding="{Binding DetectionDateText}" Width="140" MinWidth="140" SortMemberPath="DetectionTime"/>
+                    <DataGridTextColumn Header="Action" Binding="{Binding Action}" Width="140" MinWidth="140" ElementStyle="{StaticResource CellText}"/>
+                    <DataGridTextColumn Header="Statut" Binding="{Binding Status}" Width="150" MinWidth="150" ElementStyle="{StaticResource CellText}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding Items.Count, Converter={StaticResource EmptyToVis}}">
+                <TextBlock Text="Aucune menace dans cette catégorie" Style="{StaticResource H2}" HorizontalAlignment="Center"/>
+                <TextBlock Text="Microsoft Defender n'a rien enregistré pour ce filtre." Style="{StaticResource Muted}" HorizontalAlignment="Center"/>
+            </StackPanel>
+            <Border HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,24,16" Padding="10" CornerRadius="10" Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Visibility="{Binding Selected, Converter={StaticResource NotNullToVis}}">
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Ouvrir l'emplacement" Command="{Binding OpenLocationCommand}" CommandParameter="{Binding Selected}"/>
+                    <Button Content="Analyser le fichier" Command="{Binding ScanFileCommand}" CommandParameter="{Binding Selected}" Margin="0"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

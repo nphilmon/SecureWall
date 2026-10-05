@@ -1,0 +1,77 @@
+<UserControl x:Class="SecureWall.App.Views.RulesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctl="clr-namespace:SecureWall.App.Controls"
+             Style="{StaticResource PageStyle}">
+    <Grid Margin="28,6,28,20">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+        <ctl:PageHeader Title="{Binding Title}" Subtitle="{Binding Subtitle}">
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Nouvelle règle…" Command="{Binding NewCommand}" Style="{StaticResource PrimaryButton}"/>
+                <Button Content="Règles de base…" Command="{Binding OpenBaselineCommand}"/>
+                <Button Content="Importer" Command="{Binding ImportCommand}"/>
+                <Button Content="Exporter" Command="{Binding ExportCommand}" Margin="0"/>
+            </StackPanel>
+        </ctl:PageHeader>
+        <ctl:MessageBar Grid.Row="1" Text="{Binding Message}" Level="{Binding MessageLevel}"/>
+
+        <DockPanel Grid.Row="2" Margin="0,0,0,10">
+            <TextBox Tag="Rechercher une règle" DockPanel.Dock="Left" Width="260" Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Rechercher une règle" ToolTip="Nom, programme, port ou IP"/>
+            <WrapPanel Margin="14,0,0,0">
+                <RadioButton Style="{StaticResource Pill}" GroupName="dir" Content="Toutes" IsChecked="True" Checked="OnDirection" Tag="all"/>
+                <RadioButton Style="{StaticResource Pill}" GroupName="dir" Content="Entrantes" Checked="OnDirection" Tag="in"/>
+                <RadioButton Style="{StaticResource Pill}" GroupName="dir" Content="Sortantes" Checked="OnDirection" Tag="out" Margin="0,0,16,0"/>
+                <RadioButton Style="{StaticResource Pill}" GroupName="act" Content="Autoriser + Bloquer" IsChecked="True" Checked="OnAction" Tag="all"/>
+                <RadioButton Style="{StaticResource Pill}" GroupName="act" Content="Autoriser" Checked="OnAction" Tag="allow"/>
+                <RadioButton Style="{StaticResource Pill}" GroupName="act" Content="Bloquer" Checked="OnAction" Tag="block" Margin="0,0,16,0"/>
+                <RadioButton Style="{StaticResource Pill}" GroupName="st" Content="Toutes" IsChecked="True" Checked="OnStatus" Tag="all"/>
+                <RadioButton Style="{StaticResource Pill}" GroupName="st" Content="Activées" Checked="OnStatus" Tag="on"/>
+                <RadioButton Style="{StaticResource Pill}" GroupName="st" Content="Désactivées" Checked="OnStatus" Tag="off" Margin="0,0,16,0"/>
+                <CheckBox Content="Créées par SecureWall" IsChecked="{Binding OnlyMine}" VerticalAlignment="Center"/>
+            </WrapPanel>
+        </DockPanel>
+
+        <DockPanel Grid.Row="3" Margin="0,0,0,10">
+            <TextBlock DockPanel.Dock="Right" Text="{Binding CountText}" Style="{StaticResource Muted}" VerticalAlignment="Center"/>
+            <StackPanel Orientation="Horizontal" IsEnabled="{Binding Selected, Converter={StaticResource NotNullToBool}}">
+                <Button Content="Autoriser" Command="{Binding AllowCommand}" CommandParameter="{Binding Selected}"/>
+                <Button Content="Bloquer" Command="{Binding BlockCommand}" CommandParameter="{Binding Selected}"/>
+                <Button Content="Modifier…" Command="{Binding EditCommand}" CommandParameter="{Binding Selected}"/>
+                <Button Content="Dupliquer" Command="{Binding DuplicateCommand}" CommandParameter="{Binding Selected}"/>
+                <Button Content="Activer / Désactiver" Command="{Binding ToggleEnabledCommand}" CommandParameter="{Binding Selected}"/>
+                <Button Content="Supprimer…" Command="{Binding DeleteCommand}" CommandParameter="{Binding Selected}" Style="{StaticResource DangerButton}"/>
+                <Button Content="Programme" Command="{Binding OpenProgramCommand}" CommandParameter="{Binding Selected}"/>
+            </StackPanel>
+        </DockPanel>
+
+        <DataGrid Grid.Row="4" ItemsSource="{Binding View}" SelectedItem="{Binding Selected}" AutomationProperties.Name="Règles du pare-feu">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Nom" Binding="{Binding Name}" Width="240" MinWidth="240" ElementStyle="{StaticResource CellText}"/>
+                <DataGridTextColumn Header="Programme" Binding="{Binding ProgramText}" Width="220" MinWidth="220" ElementStyle="{StaticResource CellText}"/>
+                <DataGridTextColumn Header="Direction" Binding="{Binding DirectionText}" Width="95" MinWidth="95"/>
+                <DataGridTemplateColumn Header="Action" Width="95" MinWidth="95" SortMemberPath="ActionText">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding ActionText}" FontWeight="SemiBold">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                        <Setter Property="Foreground" Value="{DynamicResource GoodBrush}"/>
+                                        <Style.Triggers><DataTrigger Binding="{Binding ActionText}" Value="Bloquer"><Setter Property="Foreground" Value="{DynamicResource BadBrush}"/></DataTrigger></Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Protocole" Binding="{Binding ProtocolText}" Width="95" MinWidth="95"/>
+                <DataGridTextColumn Header="Port local" Binding="{Binding LocalPorts}" Width="105" MinWidth="105" ElementStyle="{StaticResource CellText}"/>
+                <DataGridTextColumn Header="Port distant" Binding="{Binding RemotePorts}" Width="115" MinWidth="115" ElementStyle="{StaticResource CellText}"/>
+                <DataGridTextColumn Header="IP locale" Binding="{Binding LocalAddresses}" Width="120" MinWidth="120" ElementStyle="{StaticResource CellText}"/>
+                <DataGridTextColumn Header="IP distante" Binding="{Binding RemoteAddresses}" Width="130" MinWidth="130" ElementStyle="{StaticResource CellText}"/>
+                <DataGridTextColumn Header="Profil" Binding="{Binding ProfilesText}" Width="110" MinWidth="110" ElementStyle="{StaticResource CellText}"/>
+                <DataGridTextColumn Header="Statut" Binding="{Binding StatusText}" Width="100" MinWidth="100"/>
+                <DataGridTextColumn Header="Groupe" Binding="{Binding Group}" Width="*" MinWidth="140" ElementStyle="{StaticResource CellText}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

@@ -1,0 +1,11 @@
+bin/
+obj/
+publish/
+*.user
+.vs/
+installer/keys/
+TestResults/
+*.trx
+*.pfx
+*.pem
+*.log

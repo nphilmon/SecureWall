@@ -1,0 +1,16 @@
+SecureWall Security — avant d'installer
+
+Ce programme installe :
+  • l'application SecureWall Security (interface, exécutée avec vos droits d'utilisateur, jamais en administrateur) ;
+  • un service Windows « SecureWall - Service privilégié » (compte système). Il exécute UNIQUEMENT une liste fixe d'opérations
+    nécessitant des droits administrateur (pare-feu Windows, restauration de quarantaine Microsoft Defender, mode urgence) et
+    n'accepte aucune commande arbitraire. L'application est la seule à pouvoir lui parler (tube nommé local, client authentifié).
+
+Ce programme NE MODIFIE PAS, pendant l'installation :
+  • les paramètres de Microsoft Defender (aucune exclusion, aucune désactivation) ;
+  • les règles ou les profils du pare-feu Windows ;
+  • les certificats de l'ordinateur ni les paramètres réseau.
+
+Toutes les modifications de sécurité ne sont effectuées qu'à votre demande, depuis l'application, avec confirmation.
+
+Données : tout reste sur votre ordinateur. Aucune donnée n'est envoyée à un serveur SecureWall.

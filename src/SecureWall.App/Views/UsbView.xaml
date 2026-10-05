@@ -1,0 +1,56 @@
+<UserControl x:Class="SecureWall.App.Views.UsbView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctl="clr-namespace:SecureWall.App.Controls"
+             Style="{StaticResource PageStyle}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="28,6,16,24">
+            <ctl:PageHeader Title="{Binding Title}" Subtitle="{Binding Subtitle}"/>
+            <ctl:MessageBar Text="{Binding Message}" Level="{Binding MessageLevel}"/>
+
+            <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                <StackPanel>
+                    <TextBlock Text="Options" Style="{StaticResource H2}"/>
+                    <CheckBox Content="Proposer une analyse à l'insertion" IsChecked="{Binding PromptScan}" Margin="0,10,0,0"/>
+                    <CheckBox Content="Ne proposer l'analyse que pour les nouveaux périphériques" IsChecked="{Binding OnlyNew}" IsEnabled="{Binding PromptScan}"/>
+                    <TextBlock Style="{StaticResource Muted}" FontSize="11" Margin="0,6,0,0" Text="SecureWall mémorise les périphériques connus (nom et identifiant uniquement) et ne bloque jamais un périphérique."/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                <StackPanel>
+                    <TextBlock Text="Périphériques connectés" Style="{StaticResource H2}" Margin="0,0,0,10"/>
+                    <TextBlock Text="Aucun support amovible connecté." Style="{StaticResource Muted}" Visibility="{Binding Connected.Count, Converter={StaticResource EmptyToVis}}"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10" Visibility="{Binding Connected.Count, Converter={StaticResource CountToVis}}">
+                        <Button Content="Analyser avec Microsoft Defender" Command="{Binding ScanCommand}" CommandParameter="{Binding Selected}" Style="{StaticResource PrimaryButton}" IsEnabled="{Binding Selected, Converter={StaticResource NotNullToBool}}"/>
+                        <Button Content="Ouvrir" Command="{Binding OpenDriveCommand}" CommandParameter="{Binding Selected}" IsEnabled="{Binding Selected, Converter={StaticResource NotNullToBool}}"/>
+                    </StackPanel>
+                    <DataGrid ItemsSource="{Binding Connected}" SelectedItem="{Binding Selected}" MaxHeight="260" Visibility="{Binding Connected.Count, Converter={StaticResource CountToVis}}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Nom" Binding="{Binding DisplayName}" Width="2*" MinWidth="180" ElementStyle="{StaticResource CellText}"/>
+                            <DataGridTextColumn Header="Lettre" Binding="{Binding DriveLetter}" Width="70" MinWidth="70"/>
+                            <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="*" MinWidth="180" ElementStyle="{StaticResource CellText}"/>
+                            <DataGridTextColumn Header="Capacité" Binding="{Binding SizeText}" Width="90" MinWidth="90"/>
+                            <DataGridTextColumn Header="Insertion" Binding="{Binding InsertedText}" Width="140" MinWidth="140"/>
+                            <DataGridTextColumn Header="Dernière analyse" Binding="{Binding LastScanText}" Width="160" MinWidth="160"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}" Margin="0">
+                <StackPanel>
+                    <TextBlock Text="Périphériques déjà rencontrés" Style="{StaticResource H2}" Margin="0,0,0,10"/>
+                    <DataGrid ItemsSource="{Binding Known}" MaxHeight="300">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Nom" Binding="{Binding DeviceName}" Width="*" MinWidth="180" ElementStyle="{StaticResource CellText}"/>
+                            <DataGridTextColumn Header="Première fois" Binding="{Binding FirstSeen, StringFormat=g}" Width="150" MinWidth="150"/>
+                            <DataGridTextColumn Header="Dernière fois" Binding="{Binding LastSeen, StringFormat=g}" Width="150" MinWidth="150"/>
+                            <DataGridTextColumn Header="Dernière analyse" Binding="{Binding LastScanDate, StringFormat=g, TargetNullValue=Jamais analysé}" Width="170" MinWidth="170"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

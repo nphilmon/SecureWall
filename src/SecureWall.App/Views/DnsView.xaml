@@ -1,0 +1,73 @@
+<UserControl x:Class="SecureWall.App.Views.DnsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctl="clr-namespace:SecureWall.App.Controls"
+             xmlns:vm="clr-namespace:SecureWall.App.ViewModels"
+             Style="{StaticResource PageStyle}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="28,6,16,24">
+            <ctl:PageHeader Title="{Binding Title}" Subtitle="{Binding Subtitle}">
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Actualiser" Command="{Binding RefreshCommand}"/>
+                    <Button Content="Vider le cache DNS" Command="{Binding FlushCommand}" IsEnabled="{Binding ServiceAvailable}" Margin="0"/>
+                </StackPanel>
+            </ctl:PageHeader>
+            <ctl:MessageBar Text="{Binding Message}" Level="{Binding MessageLevel}"/>
+
+            <ItemsControl ItemsSource="{Binding Adapters}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:DnsAdapterItem}">
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel>
+                                    <ctl:StatusBadge DockPanel.Dock="Right" Text="{Binding ModeText}" Level="Info"/>
+                                    <TextBlock Text="{Binding Title}" Style="{StaticResource H2}"/>
+                                </DockPanel>
+                                <TextBlock Text="{Binding Description}" Style="{StaticResource Muted}" Margin="0,2,0,10" TextTrimming="CharacterEllipsis"/>
+
+                                <TextBlock Text="Serveurs DNS utilisés" Style="{StaticResource Muted}"/>
+                                <TextBlock Text="Aucun serveur DNS configuré." Margin="0,4,0,0" Visibility="{Binding HasServers, Converter={StaticResource InvBoolToVis}}"/>
+                                <ItemsControl ItemsSource="{Binding Servers}" Margin="0,4,0,0">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="{x:Type vm:DnsServerLine}">
+                                            <DockPanel Margin="0,2">
+                                                <ctl:StatusBadge DockPanel.Dock="Right" Text="{Binding Description}" Level="{Binding Level}"/>
+                                                <TextBlock Text="{Binding Address}" FontFamily="Consolas" VerticalAlignment="Center"/>
+                                            </DockPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <TextBlock Style="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,6,0,0" Visibility="{Binding HasUnusual, Converter={StaticResource BoolToVis}}"
+                                           Text="Un serveur public non reconnu est utilisé. C'est normal si vous l'avez choisi ; sinon, vérifiez-le (un DNS détourné peut rediriger vers de faux sites)."/>
+
+                                <Separator Margin="0,12"/>
+
+                                <TextBlock Text="Utiliser un serveur DNS public" Style="{StaticResource Muted}"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                                    <ComboBox ItemsSource="{x:Static vm:DnsViewModel.PresetNames}" SelectedIndex="{Binding PresetIndex, Mode=TwoWay}" Width="290" AutomationProperties.Name="Serveur DNS prédéfini"/>
+                                    <Button Content="Appliquer"
+                                            Command="{Binding DataContext.ApplyPresetCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"
+                                            IsEnabled="{Binding DataContext.ServiceAvailable, RelativeSource={RelativeSource AncestorType=UserControl}}" Margin="10,0,0,0"/>
+                                </StackPanel>
+                                <TextBlock Text="{Binding PresetDescription}" Style="{StaticResource Muted}" Margin="0,4,0,0" TextWrapping="Wrap"/>
+
+                                <TextBlock Text="Ou saisir vos serveurs (IPv4, séparés par une virgule, 4 au maximum)" Style="{StaticResource Muted}" Margin="0,12,0,0"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                                    <TextBox Tag="Exemple : 1.1.1.1, 9.9.9.9" Width="290" Text="{Binding Custom, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Serveurs DNS personnalisés"/>
+                                    <Button Content="Appliquer"
+                                            Command="{Binding DataContext.ApplyCustomCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"
+                                            IsEnabled="{Binding DataContext.ServiceAvailable, RelativeSource={RelativeSource AncestorType=UserControl}}" Margin="10,0,0,0"/>
+                                </StackPanel>
+
+                                <Button Content="Revenir à la configuration automatique" HorizontalAlignment="Left" Margin="0,14,0,0"
+                                        Visibility="{Binding IsManual, Converter={StaticResource BoolToVis}}"
+                                        Command="{Binding DataContext.ResetCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"
+                                        IsEnabled="{Binding DataContext.ServiceAvailable, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

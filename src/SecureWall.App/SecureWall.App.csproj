@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>SecureWall.App</RootNamespace>
+    <AssemblyName>SecureWall</AssemblyName>
+    <Product>SecureWall Security</Product>
+    <PlatformTarget>x64</PlatformTarget>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Resources\securewall.ico</ApplicationIcon>
+    <SatelliteResourceLanguages>fr;en</SatelliteResourceLanguages>
+    <NoWarn>$(NoWarn);CA1416;CS8618;CS8625</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SecureWall.Core\SecureWall.Core.csproj" />
+    <ProjectReference Include="..\SecureWall.Infrastructure\SecureWall.Infrastructure.csproj" />
+    <ProjectReference Include="..\SecureWall.Security\SecureWall.Security.csproj" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
+    <Resource Include="Resources\securewall.ico" />
+    <EmbeddedResource Include="Resources\world-map.txt" />
+  </ItemGroup>
+</Project>
+

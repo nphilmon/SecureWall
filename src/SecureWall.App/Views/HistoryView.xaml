@@ -1,0 +1,136 @@
+<UserControl x:Class="SecureWall.App.Views.HistoryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctl="clr-namespace:SecureWall.App.Controls"
+             xmlns:vm="clr-namespace:SecureWall.App.ViewModels"
+             Style="{StaticResource PageStyle}">
+    <Grid Margin="28,6,28,20">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+        <ctl:PageHeader Title="{Binding Title}" Subtitle="{Binding Subtitle}"/>
+        <ctl:MessageBar Grid.Row="1" Text="{Binding Message}" Level="{Binding MessageLevel}"/>
+        <TabControl Grid.Row="2" SelectedIndex="{Binding SelectedTab, Mode=TwoWay}">
+            <TabItem Header="Événements de sécurité">
+                <Grid>
+                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                    <TextBox Tag="Rechercher un événement" HorizontalAlignment="Left" Width="320" Margin="0,0,0,10" Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Rechercher un événement"/>
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding Events}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Date" Binding="{Binding TimeText}" Width="150" MinWidth="150"/>
+                            <DataGridTemplateColumn Header="Niveau" Width="110" MinWidth="110" SortMemberPath="Severity">
+                                <DataGridTemplateColumn.CellTemplate><DataTemplate><ctl:StatusBadge Text="{Binding Severity}" Level="{Binding Level}"/></DataTemplate></DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="Type" Binding="{Binding EventType}" Width="110" MinWidth="110"/>
+                            <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*" MinWidth="180" ElementStyle="{StaticResource CellText}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Button Grid.Row="2" Content="Charger plus" Command="{Binding MoreEventsCommand}" Visibility="{Binding HasMoreEvents, Converter={StaticResource BoolToVis}}" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Journal d'audit">
+                <Grid>
+                    <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                    <DataGrid ItemsSource="{Binding Audit}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Date" Binding="{Binding TimeText}" Width="150" MinWidth="150"/>
+                            <DataGridTextColumn Header="Utilisateur" Binding="{Binding User}" Width="140" MinWidth="140"/>
+                            <DataGridTextColumn Header="Action" Binding="{Binding Action}" Width="260" MinWidth="260" ElementStyle="{StaticResource CellText}"/>
+                            <DataGridTextColumn Header="Détails" Binding="{Binding Details}" Width="*" MinWidth="180" ElementStyle="{StaticResource CellText}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Button Grid.Row="1" Content="Charger plus" Command="{Binding MoreAuditCommand}" Visibility="{Binding HasMoreAudit, Converter={StaticResource BoolToVis}}" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Analyses">
+                <Grid>
+                    <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                    <DataGrid ItemsSource="{Binding Scans}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Type" Binding="{Binding ScanType}" Width="110" MinWidth="110"/>
+                            <DataGridTextColumn Header="Début" Binding="{Binding StartText}" Width="150" MinWidth="150"/>
+                            <DataGridTextColumn Header="Fin" Binding="{Binding EndText}" Width="150" MinWidth="150"/>
+                            <DataGridTextColumn Header="Durée" Binding="{Binding DurationText}" Width="90" MinWidth="90"/>
+                            <DataGridTextColumn Header="Menaces" Binding="{Binding ThreatsFound}" Width="80" MinWidth="80"/>
+                            <DataGridTextColumn Header="Statut" Binding="{Binding Status}" Width="100" MinWidth="100"/>
+                            <DataGridTextColumn Header="Cible" Binding="{Binding Target}" Width="*" MinWidth="180" ElementStyle="{StaticResource CellText}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Button Grid.Row="1" Content="Charger plus" Command="{Binding MoreScansCommand}" Visibility="{Binding HasMoreScans, Converter={StaticResource BoolToVis}}" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Connexions bloquées">
+                <Grid>
+                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                    <WrapPanel Margin="0,0,0,8">
+                        <TextBlock Text="Période" Style="{StaticResource Muted}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <ComboBox ItemsSource="{x:Static vm:HistoryViewModel.BlockedPeriods}" SelectedIndex="{Binding BlockedPeriod, Mode=TwoWay}" Width="140" Margin="0,0,16,0" AutomationProperties.Name="Période"/>
+                        <TextBlock Text="Direction" Style="{StaticResource Muted}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <ComboBox ItemsSource="{x:Static vm:HistoryViewModel.BlockedDirections}" SelectedIndex="{Binding BlockedDirection, Mode=TwoWay}" Width="120" Margin="0,0,16,0" AutomationProperties.Name="Direction"/>
+                        <TextBox Tag="Application, adresse, port…" Width="260" Margin="0,0,16,0" Text="{Binding BlockedSearch, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Filtrer les connexions bloquées"/>
+                        <Button Content="Exporter en CSV…" Command="{Binding ExportBlockedCommand}" Margin="0"/>
+                    </WrapPanel>
+                    <TextBlock Grid.Row="1" Text="{Binding BlockedSummary}" Style="{StaticResource Muted}" Margin="0,0,0,8" TextWrapping="Wrap"/>
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="340"/></Grid.ColumnDefinitions>
+                        <DataGrid ItemsSource="{Binding Blocked}" SelectedItem="{Binding SelectedBlocked, Mode=TwoWay}" Margin="0,0,12,0">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Date" Binding="{Binding TimeText}" Width="150" MinWidth="150"/>
+                                <DataGridTextColumn Header="Application" Binding="{Binding Application}" Width="*" MinWidth="130" ElementStyle="{StaticResource CellText}"/>
+                                <DataGridTextColumn Header="Sens" Binding="{Binding Direction}" Width="80" MinWidth="80"/>
+                                <DataGridTextColumn Header="Proto." Binding="{Binding Protocol}" Width="60" MinWidth="60"/>
+                                <DataGridTextColumn Header="Adresse distante" Binding="{Binding RemoteAddress}" Width="*" MinWidth="130" ElementStyle="{StaticResource CellText}"/>
+                                <DataGridTextColumn Header="Port / service" Binding="{Binding PortText}" Width="150" MinWidth="110" ElementStyle="{StaticResource CellText}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+                            <StackPanel>
+                                <Border Style="{StaticResource Card}" Visibility="{Binding SelectedBlocked, Converter={StaticResource NotNullToVis}}">
+                                    <StackPanel>
+                                        <TextBlock Text="Détail de la connexion" Style="{StaticResource H2}"/>
+                                        <TextBlock Text="{Binding SelectedBlocked.Explanation}" TextWrapping="Wrap" Margin="0,8,0,10"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                                            <TextBlock Text="Date" Style="{StaticResource Muted}" Margin="0,2,14,2"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding SelectedBlocked.TimeText}" Margin="0,2"/>
+                                            <TextBlock Grid.Row="1" Text="Application" Style="{StaticResource Muted}" Margin="0,2,14,2"/>
+                                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedBlocked.Application}" TextWrapping="Wrap" Margin="0,2"/>
+                                            <TextBlock Grid.Row="2" Text="Adresse" Style="{StaticResource Muted}" Margin="0,2,14,2"/>
+                                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedBlocked.RemoteAddress}" TextWrapping="Wrap" Margin="0,2"/>
+                                            <TextBlock Grid.Row="3" Text="Nature" Style="{StaticResource Muted}" Margin="0,2,14,2"/>
+                                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelectedBlocked.AddressKind}" TextWrapping="Wrap" Margin="0,2"/>
+                                            <TextBlock Grid.Row="4" Text="Port" Style="{StaticResource Muted}" Margin="0,2,14,2"/>
+                                            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding SelectedBlocked.PortText}" TextWrapping="Wrap" Margin="0,2"/>
+                                            <TextBlock Grid.Row="5" Text="Nom d'hôte" Style="{StaticResource Muted}" Margin="0,2,14,2"/>
+                                            <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding BlockedHostText}" TextWrapping="Wrap" Margin="0,2"/>
+                                        </Grid>
+                                        <WrapPanel Margin="0,10,0,0">
+                                            <Button Content="Résoudre le nom (DNS)" Command="{Binding ResolveBlockedHostCommand}"
+                                                    IsEnabled="{Binding BlockedHostBusy, Converter={StaticResource InvBool}}" Visibility="{Binding CanResolveBlockedHost, Converter={StaticResource BoolToVis}}"
+                                                    ToolTip="Interroge votre serveur DNS avec cette adresse (uniquement quand vous cliquez)." AutomationProperties.Name="Résoudre le nom d'hôte de l'adresse distante"/>
+                                            <Button Content="Copier" Command="{Binding CopyBlockedCommand}" CommandParameter="{Binding SelectedBlocked}" Margin="0"/>
+                                        </WrapPanel>
+                                    </StackPanel>
+                                </Border>
+                                <Border Style="{StaticResource Card}" Margin="0">
+                                    <StackPanel>
+                                        <TextBlock Text="Les plus fréquents" Style="{StaticResource H2}"/>
+                                        <TextBlock Text="Applications" Style="{StaticResource Muted}" Margin="0,8,0,2"/>
+                                        <ItemsControl ItemsSource="{Binding TopBlockedApps}"><ItemsControl.ItemTemplate><DataTemplate><TextBlock Text="{Binding}" TextTrimming="CharacterEllipsis"/></DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+                                        <TextBlock Text="Adresses distantes" Style="{StaticResource Muted}" Margin="0,8,0,2"/>
+                                        <ItemsControl ItemsSource="{Binding TopBlockedRemotes}"><ItemsControl.ItemTemplate><DataTemplate><TextBlock Text="{Binding}" TextTrimming="CharacterEllipsis"/></DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+                                        <TextBlock Text="Ports" Style="{StaticResource Muted}" Margin="0,8,0,2"/>
+                                        <ItemsControl ItemsSource="{Binding TopBlockedPorts}"><ItemsControl.ItemTemplate><DataTemplate><TextBlock Text="{Binding}" TextTrimming="CharacterEllipsis"/></DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="440" Visibility="{Binding Blocked.Count, Converter={StaticResource EmptyToVis}}">
+                            <TextBlock Text="Aucune connexion bloquée" Style="{StaticResource H2}" HorizontalAlignment="Center"/>
+                            <TextBlock Style="{StaticResource Muted}" HorizontalAlignment="Center" TextAlignment="Center" Text="Windows ne journalise les connexions refusées que si l'audit est activé (page Pare-feu) et le service privilégié actif."/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>

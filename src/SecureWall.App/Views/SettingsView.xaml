@@ -1,0 +1,110 @@
+﻿<UserControl x:Class="SecureWall.App.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctl="clr-namespace:SecureWall.App.Controls"
+             Style="{StaticResource PageStyle}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="28,6,16,24" MaxWidth="900" HorizontalAlignment="Left">
+            <ctl:PageHeader Title="{Binding Title}" Subtitle="{Binding Subtitle}"/>
+            <ctl:MessageBar Text="{Binding Message}" Level="{Binding MessageLevel}"/>
+
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="Général" Style="{StaticResource H2}" Margin="0,0,0,6"/>
+                    <CheckBox Content="Démarrer SecureWall avec Windows (dans la zone de notification)" IsChecked="{Binding StartWithWindows}"/>
+                    <CheckBox Content="Réduire dans la zone de notification à la fermeture (la surveillance continue)" IsChecked="{Binding MinimizeToTray}"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                        <TextBlock Text="Fréquence d'actualisation (secondes) :" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <TextBox Tag="Fréquence d'actualisation en secondes" Width="60" Text="{Binding RefreshSeconds, UpdateSourceTrigger=LostFocus}" AutomationProperties.Name="Fréquence d'actualisation en secondes"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="Antivirus et notifications Windows" Style="{StaticResource H2}" Margin="0,0,0,6"/>
+                    <CheckBox Content="Activer les notifications Windows" IsChecked="{Binding NotificationsEnabled}"/>
+                    <StackPanel Margin="26,0,0,0" IsEnabled="{Binding NotificationsEnabled}">
+                        <CheckBox Content="Menaces détectées, supprimées ou mises en quarantaine" IsChecked="{Binding NotifyThreats}"/>
+                        <CheckBox Content="Fin d'analyse" IsChecked="{Binding NotifyScans}"/>
+                        <CheckBox Content="Pare-feu ou antivirus désactivé, modifications de sécurité, nouvelle application réseau" IsChecked="{Binding NotifyFirewall}"/>
+                        <CheckBox Content="Signatures antivirus obsolètes" IsChecked="{Binding NotifySignatures}"/>
+                        <CheckBox Content="Périphérique USB détecté" IsChecked="{Binding NotifyUsb}"/>
+                    </StackPanel>
+                    <CheckBox Content="Proposer une analyse à l'insertion d'un support USB" IsChecked="{Binding UsbPromptScan}" Margin="0,8,0,0"/>
+                    <CheckBox Content="Uniquement pour les nouveaux périphériques" IsChecked="{Binding UsbOnlyNew}" Margin="26,4,0,0"/>
+                    <CheckBox Content="Surveiller les changements de sécurité (exclusions, règles, démarrage, désactivations)" IsChecked="{Binding MonitorChanges}" Margin="0,8,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="Pare-feu" Style="{StaticResource H2}" Margin="0,0,0,6"/>
+                    <CheckBox Content="Me prévenir lorsqu'une nouvelle application accède au réseau" IsChecked="{Binding AlertNewApps}"/>
+                    <CheckBox Content="Demander confirmation avant de modifier une règle" IsChecked="{Binding ConfirmRules}"/>
+                    <CheckBox Content="Enregistrer les connexions externes (statistiques et applications)" IsChecked="{Binding RecordConnections}"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                        <TextBlock Text="{Binding ServiceText}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock Style="{StaticResource Muted}" Margin="0,4,0,0" Text="Le service privilégié exécute uniquement les opérations nécessitant des droits administrateur (pare-feu, restauration de quarantaine, mode urgence). L'interface, elle, ne tourne jamais en administrateur."/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="Interface" Style="{StaticResource H2}" Margin="0,0,0,6"/>
+                    <RadioButton Content="Thème du système" IsChecked="{Binding ThemeSystem}" GroupName="theme"/>
+                    <RadioButton Content="Clair" IsChecked="{Binding ThemeLight}" GroupName="theme"/>
+                    <RadioButton Content="Sombre" IsChecked="{Binding ThemeDark}" GroupName="theme"/>
+                    <TextBlock Text="Langue : Français (seule langue disponible pour l'instant)" Style="{StaticResource Muted}" Margin="0,8,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="Confidentialité et données" Style="{StaticResource H2}" Margin="0,0,0,6"/>
+                    <TextBlock TextWrapping="Wrap" Text="SecureWall fonctionne localement. Il n'envoie aucune donnée à un serveur SecureWall, ne téléverse aucun fichier et n'enregistre ni le contenu des fichiers ni les documents consultés. L'historique ne contient que des métadonnées (noms, chemins, adresses, dates). La protection cloud éventuelle est une fonction de Microsoft Defender, indiquée comme telle. Seules exceptions, à votre initiative : la recherche de mises à jour contacte GitHub lorsque vous cliquez sur le bouton, et la page Carte n'interroge le service api.country.is (adresses IP publiques des serveurs contactés, rien d'autre) que si vous activez explicitement la localisation en ligne."/>
+                    <TextBlock Margin="0,8,0,0"><Run Text="Dossier des données : "/><Run Text="{Binding DataFolder, Mode=OneWay}" FontWeight="SemiBold"/></TextBlock>
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                        <TextBlock Text="Conserver l'historique (jours) :" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <TextBox Tag="Durée de conservation en jours" Width="60" Text="{Binding RetentionDays, UpdateSourceTrigger=LostFocus}" AutomationProperties.Name="Durée de conservation en jours"/>
+                    </StackPanel>
+                    <WrapPanel Margin="0,12,0,0">
+                        <Button Content="Ouvrir le dossier" Command="{Binding OpenDataFolderCommand}"/>
+                        <Button Content="Effacer l'historique…" Command="{Binding ClearHistoryCommand}" Style="{StaticResource DangerButton}"/>
+                        <Button Content="Supprimer les journaux…" Command="{Binding ClearLogsCommand}"/>
+                    </WrapPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="Mises à jour de l'application" Style="{StaticResource H2}" Margin="0,0,0,6"/>
+                    <TextBlock TextWrapping="Wrap" Style="{StaticResource Muted}"><Run Text="Version installée : "/><Run Text="{Binding Version, Mode=OneWay}" FontWeight="SemiBold"/><Run Text=". La recherche ne se fait que lorsque vous cliquez sur le bouton : le manifeste est signé (ECDSA P-256), l'installateur n'est téléchargé que depuis GitHub et son empreinte SHA-256 est vérifiée avant tout lancement."/></TextBlock>
+                    <TextBox Tag="https://raw.githubusercontent.com/…/update.signed.json" Margin="0,10,0,0" Text="{Binding UpdateUrl, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Adresse du manifeste de mise à jour"/>
+                    <WrapPanel Margin="0,10,0,0">
+                        <Button Content="Rechercher une mise à jour" Command="{Binding CheckUpdateCommand}" IsEnabled="{Binding UpdateBusy, Converter={StaticResource InvBool}}"/>
+                        <Button Content="{Binding UpdateInstallText}" Command="{Binding InstallUpdateCommand}" Style="{StaticResource PrimaryButton}"
+                                IsEnabled="{Binding UpdateBusy, Converter={StaticResource InvBool}}" Visibility="{Binding UpdateAvailable, Converter={StaticResource BoolToVis}}"/>
+                    </WrapPanel>
+                    <ProgressBar Minimum="0" Maximum="1" Value="{Binding UpdateProgress}" Height="6" Margin="0,10,0,0" Visibility="{Binding UpdateBusy, Converter={StaticResource BoolToVis}}"/>
+                    <TextBlock Text="{Binding UpdateStatus}" TextWrapping="Wrap" Margin="0,10,0,0"/>
+                    <TextBlock Text="{Binding UpdateNotes}" TextWrapping="Wrap" Style="{StaticResource Muted}" Margin="0,6,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="Sauvegarde et assistant" Style="{StaticResource H2}" Margin="0,0,0,6"/>
+                    <WrapPanel>
+                        <Button Content="Exporter les réglages" Command="{Binding ExportSettingsCommand}"/>
+                        <Button Content="Importer des réglages" Command="{Binding ImportSettingsCommand}"/>
+                        <Button Content="Relancer l'assistant de bienvenue" Command="{Binding RunFirstRunCommand}"/>
+                    </WrapPanel>
+                    <TextBlock Style="{StaticResource Muted}" Margin="0,10,0,0"><Run Text="SecureWall Security "/><Run Text="{Binding Version, Mode=OneWay}"/><Run Text=" — s'appuie sur Microsoft Defender Antivirus et Windows Defender Firewall."/></TextBlock>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
+

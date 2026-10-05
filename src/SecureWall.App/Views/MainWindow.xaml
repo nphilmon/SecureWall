@@ -1,0 +1,85 @@
+<Window x:Class="SecureWall.App.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ctl="clr-namespace:SecureWall.App.Controls"
+        Title="SecureWall Security" Width="1280" Height="800" MinWidth="860" MinHeight="420"
+        Background="{DynamicResource BgBrush}" Icon="pack://application:,,,/Resources/securewall.ico"
+        WindowStartupLocation="CenterScreen" UseLayoutRounding="True" TextOptions.TextFormattingMode="Ideal"
+        FontFamily="Segoe UI Variable Text, Segoe UI" FontSize="13">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="248"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Barre latérale -->
+        <Border Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="20,22,16,14">
+                    <Border Width="34" Height="34" CornerRadius="9" Background="{DynamicResource AccentBrush}">
+                        <TextBlock Text="&#xEA18;" Style="{StaticResource Icon}" Foreground="{DynamicResource OnAccentBrush}" FontSize="18" HorizontalAlignment="Center"/>
+                    </Border>
+                    <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="SecureWall" FontWeight="Bold" FontSize="16"/>
+                        <TextBlock Text="Security" Style="{StaticResource Muted}" FontSize="11"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel DockPanel.Dock="Bottom" Margin="14,8,14,16">
+                    <Button Command="{Binding EmergencyCutoffCommand}" Visibility="{Binding EmergencyActive, Converter={StaticResource InvBoolToVis}}"
+                            Style="{StaticResource DangerButton}" Margin="0" AutomationProperties.Name="Couper les connexions Internet">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE7E8;" Style="{StaticResource Icon}" Foreground="{DynamicResource BadBrush}" Margin="0,0,8,0"/>
+                            <TextBlock Text="Couper Internet" Foreground="{DynamicResource BadBrush}"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding EmergencyRestoreCommand}" Visibility="{Binding EmergencyActive, Converter={StaticResource BoolToVis}}"
+                            Style="{StaticResource PrimaryButton}" Margin="0" AutomationProperties.Name="Restaurer les connexions Internet">
+                        <TextBlock Text="Restaurer Internet"/>
+                    </Button>
+                </StackPanel>
+
+                <ListBox ItemsSource="{Binding Items}" SelectedItem="{Binding Selected, Mode=TwoWay}" ItemContainerStyle="{StaticResource NavItem}"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="Navigation principale">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Glyph}" Style="{StaticResource Icon}" FontSize="16" Width="22" Margin="0,0,12,0"/>
+                                <TextBlock Text="{Binding Title}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </Border>
+
+        <!-- Contenu -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Border Padding="28,14,28,0">
+                <DockPanel LastChildFill="False">
+                    <ctl:StatusBadge DockPanel.Dock="Right" Text="{Binding Summary.StateText}" Level="{Binding Summary.StateLevel}"/>
+                    <TextBlock DockPanel.Dock="Right" Text="État général :" Style="{StaticResource Muted}" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                    <ctl:StatusBadge DockPanel.Dock="Left" Text="{Binding EmergencyBadge}" Level="Bad" Visibility="{Binding EmergencyActive, Converter={StaticResource BoolToVis}}"/>
+                </DockPanel>
+            </Border>
+
+            <Border Grid.Row="1" Margin="28,10,28,0" Padding="14,10" CornerRadius="8" Background="{DynamicResource WarnSoftBrush}"
+                    Visibility="{Binding ShowServiceBanner, Converter={StaticResource BoolToVis}}">
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Content="✕" Command="{Binding DismissBannerCommand}" Margin="8,0,0,0" Padding="9,4" ToolTip="Masquer ce message" AutomationProperties.Name="Masquer le message"/>
+                    <Button DockPanel.Dock="Right" Content="Paramètres" Command="{Binding GoToSettingsCommand}" Margin="12,0,0,0"/>
+                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource WarnBrush}" VerticalAlignment="Center"
+                               Text="Le service privilégié SecureWall n'est pas démarré : la lecture reste possible, mais les modifications du pare-feu, la restauration de quarantaine et le mode urgence sont indisponibles."/>
+                </DockPanel>
+            </Border>
+
+            <ContentControl Grid.Row="2" Content="{Binding CurrentPage}" IsTabStop="False"/>
+        </Grid>
+    </Grid>
+</Window>

@@ -1,0 +1,16 @@
+{
+  "Format": "SecureWall.Baseline",
+  "Version": 1,
+  "Name": "Règles de base SecureWall",
+  "Published": "2026-10-04",
+  "Source": "Recommandations de durcissement Microsoft / CISA (protocoles hérités et services d'administration exposés)",
+  "Rules": [
+    { "Name": "SecureWall Base - Bloquer Telnet sortant", "Description": "Telnet transmet les identifiants en clair. Bloque le trafic sortant TCP 23.", "Enabled": true, "Direction": "Outbound", "Action": "Block", "Protocol": "Tcp", "RemotePorts": "23", "Profiles": "All" },
+    { "Name": "SecureWall Base - Bloquer TFTP sortant", "Description": "TFTP n'a aucune authentification. Bloque UDP 69 sortant.", "Enabled": true, "Direction": "Outbound", "Action": "Block", "Protocol": "Udp", "RemotePorts": "69", "Profiles": "All" },
+    { "Name": "SecureWall Base - Bloquer SMB/NetBIOS entrant depuis Internet", "Description": "Empêche l'accès aux partages Windows depuis Internet (TCP 135, 139, 445).", "Enabled": true, "Direction": "Inbound", "Action": "Block", "Protocol": "Tcp", "LocalPorts": "135,139,445", "RemoteAddresses": "Internet", "Profiles": "All" },
+    { "Name": "SecureWall Base - Bloquer SMB/NetBIOS sortant vers Internet", "Description": "Évite les fuites d'authentification NTLM vers Internet (TCP 135, 139, 445).", "Enabled": true, "Direction": "Outbound", "Action": "Block", "Protocol": "Tcp", "RemotePorts": "135,139,445", "RemoteAddresses": "Internet", "Profiles": "All" },
+    { "Name": "SecureWall Base - Bloquer Bureau à distance entrant depuis Internet", "Description": "Bloque RDP (TCP 3389) depuis Internet. Votre réseau local n'est pas concerné. Désactivez cette règle si vous utilisez volontairement RDP via Internet.", "Enabled": true, "Direction": "Inbound", "Action": "Block", "Protocol": "Tcp", "LocalPorts": "3389", "RemoteAddresses": "Internet", "Profiles": "All" },
+    { "Name": "SecureWall Base - Bloquer WinRM entrant depuis Internet", "Description": "Bloque l'administration à distance WinRM (TCP 5985, 5986) depuis Internet.", "Enabled": true, "Direction": "Inbound", "Action": "Block", "Protocol": "Tcp", "LocalPorts": "5985,5986", "RemoteAddresses": "Internet", "Profiles": "All" },
+    { "Name": "SecureWall Base - Bloquer UPnP/SSDP entrant depuis Internet", "Description": "Bloque UDP 1900 depuis Internet (découverte d'appareils, vecteur d'amplification).", "Enabled": true, "Direction": "Inbound", "Action": "Block", "Protocol": "Udp", "LocalPorts": "1900", "RemoteAddresses": "Internet", "Profiles": "All" }
+  ]
+}

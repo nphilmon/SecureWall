@@ -1,0 +1,78 @@
+<UserControl x:Class="SecureWall.App.Views.StatisticsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctl="clr-namespace:SecureWall.App.Controls"
+             Style="{StaticResource PageStyle}">
+    <UserControl.Resources>
+        <DataTemplate x:Key="BarTemplate">
+            <Grid Margin="0,3">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="190"/><ColumnDefinition Width="*"/><ColumnDefinition Width="60"/></Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" ToolTip="{Binding Label}"/>
+                <Border Grid.Column="1" Height="14" CornerRadius="7" Background="{DynamicResource NeutralSoftBrush}" Margin="8,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="{Binding Fraction, Converter={StaticResource FractionToStar}}"/>
+                            <ColumnDefinition Width="{Binding Rest, Converter={StaticResource FractionToStar}}"/>
+                        </Grid.ColumnDefinitions>
+                        <Border CornerRadius="7" Background="{DynamicResource AccentBrush}"/>
+                    </Grid>
+                </Border>
+                <TextBlock Grid.Column="2" Text="{Binding ValueText}" HorizontalAlignment="Right" VerticalAlignment="Center" FontWeight="SemiBold"/>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="HourTemplate">
+            <Grid Margin="0,2">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="60"/><ColumnDefinition Width="*"/><ColumnDefinition Width="50"/></Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding Label}" VerticalAlignment="Center" Style="{StaticResource Muted}"/>
+                <Border Grid.Column="1" Height="10" CornerRadius="5" Background="{DynamicResource NeutralSoftBrush}" Margin="8,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="{Binding Fraction, Converter={StaticResource FractionToStar}}"/>
+                            <ColumnDefinition Width="{Binding Rest, Converter={StaticResource FractionToStar}}"/>
+                        </Grid.ColumnDefinitions>
+                        <Border CornerRadius="5" Background="{DynamicResource GoodBrush}"/>
+                    </Grid>
+                </Border>
+                <TextBlock Grid.Column="2" Text="{Binding ValueText}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="28,6,16,24">
+            <ctl:PageHeader Title="{Binding Title}" Subtitle="{Binding Subtitle}">
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton Style="{StaticResource Pill}" GroupName="per" Content="24 heures" IsChecked="True" Checked="OnPeriod" Tag="24h"/>
+                    <RadioButton Style="{StaticResource Pill}" GroupName="per" Content="7 jours" Checked="OnPeriod" Tag="7d"/>
+                    <RadioButton Style="{StaticResource Pill}" GroupName="per" Content="30 jours" Checked="OnPeriod" Tag="30d" Margin="0"/>
+                </StackPanel>
+            </ctl:PageHeader>
+            <ctl:MessageBar Text="{Binding Message}" Level="{Binding MessageLevel}"/>
+
+            <UniformGrid Columns="4">
+                <Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="Analyses réalisées" Style="{StaticResource Muted}"/><TextBlock Text="{Binding Scans}" Style="{StaticResource H1}"/></StackPanel></Border>
+                <Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="Menaces détectées" Style="{StaticResource Muted}"/><TextBlock Text="{Binding Threats}" Style="{StaticResource H1}"/></StackPanel></Border>
+                <Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="Connexions bloquées" Style="{StaticResource Muted}"/><TextBlock Text="{Binding Blocked}" Style="{StaticResource H1}"/></StackPanel></Border>
+                <Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="Connexions externes suivies" Style="{StaticResource Muted}"/><TextBlock Text="{Binding ConnectionsTotal}" Style="{StaticResource H1}"/></StackPanel></Border>
+            </UniformGrid>
+
+            <ctl:MessageBar Level="Info" Text="Aucune connexion externe enregistrée sur cette période : les statistiques se remplissent à mesure que SecureWall observe le réseau." Visibility="{Binding NoData, Converter={StaticResource BoolToVis}}"/>
+
+            <UniformGrid Columns="2">
+                <Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="Applications les plus connectées" Style="{StaticResource H2}" Margin="0,0,0,8"/><ItemsControl ItemsSource="{Binding TopApps}" ItemTemplate="{StaticResource BarTemplate}"/></StackPanel></Border>
+                <Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="Ports distants utilisés" Style="{StaticResource H2}" Margin="0,0,0,8"/><ItemsControl ItemsSource="{Binding Ports}" ItemTemplate="{StaticResource BarTemplate}"/></StackPanel></Border>
+                <Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="Destinations IP les plus fréquentes" Style="{StaticResource H2}" Margin="0,0,0,8"/><ItemsControl ItemsSource="{Binding Destinations}" ItemTemplate="{StaticResource BarTemplate}"/></StackPanel></Border>
+                <Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="Connexions bloquées par application" Style="{StaticResource H2}" Margin="0,0,0,8"/>
+                    <TextBlock Style="{StaticResource Muted}" Text="Aucune donnée (audit du pare-feu désactivé ou aucune connexion bloquée)." Visibility="{Binding BlockedApps.Count, Converter={StaticResource EmptyToVis}}"/>
+                    <ItemsControl ItemsSource="{Binding BlockedApps}" ItemTemplate="{StaticResource BarTemplate}"/></StackPanel></Border>
+            </UniformGrid>
+
+            <Border Style="{StaticResource Card}" Margin="0">
+                <StackPanel>
+                    <TextBlock Text="Connexions par heure" Style="{StaticResource H2}" Margin="0,0,0,8"/>
+                    <ItemsControl ItemsSource="{Binding ByHour}" ItemTemplate="{StaticResource HourTemplate}"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,122 @@
+﻿<UserControl x:Class="SecureWall.App.Views.WorldMapView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctl="clr-namespace:SecureWall.App.Controls"
+             xmlns:vm="clr-namespace:SecureWall.App.ViewModels"
+             Style="{StaticResource PageStyle}">
+    <UserControl.Resources>
+        <Style x:Key="CountryPath" TargetType="Path">
+            <Setter Property="Fill" Value="{DynamicResource NeutralSoftBrush}"/>
+            <Setter Property="Stroke" Value="{DynamicResource SurfaceBrush}"/>
+            <Setter Property="StrokeThickness" Value="0.5"/>
+            <Setter Property="StrokeLineJoin" Value="Round"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="ToolTip" Value="{Binding Tooltip}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding HasTraffic}" Value="True">
+                    <Setter Property="Fill" Value="{DynamicResource AccentBrush}"/>
+                    <Setter Property="Opacity" Value="{Binding Intensity}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                    <Setter Property="Stroke" Value="{DynamicResource BadBrush}"/>
+                    <Setter Property="StrokeThickness" Value="1.6"/>
+                    <Setter Property="Opacity" Value="1"/>
+                </DataTrigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Stroke" Value="{DynamicResource TextBrush}"/>
+                    <Setter Property="StrokeThickness" Value="1.2"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="28,6,16,24">
+            <ctl:PageHeader Title="{Binding Title}" Subtitle="{Binding Subtitle}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Période" Style="{StaticResource Muted}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <ComboBox ItemsSource="{x:Static vm:WorldMapViewModel.Periods}" SelectedIndex="{Binding Period, Mode=TwoWay}" Width="140" AutomationProperties.Name="Période"/>
+                    <Button Content="Actualiser" Command="{Binding RefreshCommand}" Margin="10,0,0,0"/>
+                </StackPanel>
+            </ctl:PageHeader>
+            <ctl:MessageBar Text="{Binding Message}" Level="{Binding MessageLevel}"/>
+
+            <Border Style="{StaticResource Card}" Visibility="{Binding GeoEnabled, Converter={StaticResource InvBoolToVis}}" BorderBrush="{DynamicResource AccentBrush}">
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Content="Activer la localisation en ligne…" Command="{Binding EnableGeoCommand}" Style="{StaticResource PrimaryButton}" VerticalAlignment="Center" Margin="16,0,0,0"/>
+                    <StackPanel>
+                        <TextBlock Text="Localisation des adresses désactivée" Style="{StaticResource H2}"/>
+                        <TextBlock Style="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,4,0,0"
+                                   Text="Par défaut SecureWall n'envoie aucune adresse à un tiers. Pour placer les serveurs sur la carte, il faut autoriser l'interrogation d'un service en ligne (adresses publiques uniquement). Vous gardez la main : confirmation détaillée avant activation."/>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <DockPanel Margin="0,0,0,8">
+                        <TextBlock DockPanel.Dock="Right" Text="Plus la couleur est foncée, plus il y a de connexions" Style="{StaticResource Muted}" FontSize="11" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding SummaryText}" FontWeight="SemiBold"/>
+                    </DockPanel>
+                    <Viewbox Stretch="Uniform" MaxHeight="440" StretchDirection="DownOnly">
+                        <ItemsControl ItemsSource="{Binding Countries}" Width="{Binding MapWidth}" Height="{Binding MapHeight}" Focusable="False">
+                            <ItemsControl.ItemsPanel><ItemsPanelTemplate><Canvas Background="Transparent"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:MapCountry}">
+                                    <Path Data="{Binding Geometry}" Style="{StaticResource CountryPath}" MouseLeftButtonUp="Country_MouseLeftButtonUp"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Viewbox>
+                    <TextBlock Text="{Binding GeoStatus}" Style="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,8,0,0"/>
+                    <WrapPanel Margin="0,10,0,0" Visibility="{Binding GeoEnabled, Converter={StaticResource BoolToVis}}">
+                        <Button Content="Désactiver la localisation en ligne" Command="{Binding DisableGeoCommand}"/>
+                        <Button Content="Effacer les pays enregistrés…" Command="{Binding ClearGeoCacheCommand}" Margin="0"/>
+                    </WrapPanel>
+                </StackPanel>
+            </Border>
+
+            <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                <Border Style="{StaticResource Card}" Margin="0">
+                    <StackPanel>
+                        <TextBlock Text="Pays" Style="{StaticResource H2}" Margin="0,0,0,8"/>
+                        <DataGrid ItemsSource="{Binding Stats}" SelectedItem="{Binding SelectedStat, Mode=TwoWay}" MaxHeight="420" AutomationProperties.Name="Connexions par pays">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Pays" Binding="{Binding Name}" Width="*" MinWidth="130" ElementStyle="{StaticResource CellText}"/>
+                                <DataGridTextColumn Header="Connexions" Binding="{Binding Connections}" Width="100" MinWidth="90"/>
+                                <DataGridTextColumn Header="Adresses" Binding="{Binding Addresses}" Width="80" MinWidth="70"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="2" Style="{StaticResource Card}" Margin="0">
+                    <StackPanel>
+                        <TextBlock Text="Détail" Style="{StaticResource H2}" Margin="0,0,0,8"/>
+                        <TextBlock Style="{StaticResource Muted}" TextWrapping="Wrap" Text="Cliquez sur un pays de la carte ou du tableau pour voir quelles applications et quelles adresses y sont contactées."
+                                   Visibility="{Binding HasSelection, Converter={StaticResource InvBoolToVis}}"/>
+                        <StackPanel Visibility="{Binding HasSelection, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="{Binding SelectedTitle}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                            <TextBlock Text="Applications" Style="{StaticResource Muted}" Margin="0,10,0,2"/>
+                            <ItemsControl ItemsSource="{Binding SelectedStat.Apps}">
+                                <ItemsControl.ItemTemplate><DataTemplate>
+                                    <DockPanel Margin="0,1"><TextBlock DockPanel.Dock="Right" Text="{Binding Connections}" Style="{StaticResource Muted}"/><TextBlock Text="{Binding Application}" TextTrimming="CharacterEllipsis"/></DockPanel>
+                                </DataTemplate></ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <TextBlock Text="Adresses les plus contactées" Style="{StaticResource Muted}" Margin="0,10,0,2"/>
+                            <ItemsControl ItemsSource="{Binding SelectedStat.TopAddresses}">
+                                <ItemsControl.ItemTemplate><DataTemplate>
+                                    <StackPanel Margin="0,3">
+                                        <DockPanel><TextBlock DockPanel.Dock="Right" Text="{Binding Connections}" Style="{StaticResource Muted}"/><TextBlock Text="{Binding Address}" FontFamily="Consolas"/></DockPanel>
+                                        <TextBlock Style="{StaticResource Muted}" FontSize="11" TextTrimming="CharacterEllipsis"><Run Text="ports "/><Run Text="{Binding Ports, Mode=OneWay}"/><Run Text=" · "/><Run Text="{Binding Applications, Mode=OneWay}"/></TextBlock>
+                                    </StackPanel>
+                                </DataTemplate></ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
+

@@ -1,0 +1,37 @@
+﻿<Application x:Class="SecureWall.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:SecureWall.App.ViewModels"
+             xmlns:views="clr-namespace:SecureWall.App.Views"
+             ShutdownMode="OnExplicitShutdown">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/Light.xaml"/>
+                <ResourceDictionary Source="Themes/Controls.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <DataTemplate DataType="{x:Type vm:DashboardViewModel}"><views:DashboardView/></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:AntivirusDashboardViewModel}"><views:AntivirusDashboardView/></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:ScanViewModel}"><views:ScanView/></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:ThreatsViewModel}"><views:ThreatsView/></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:QuarantineViewModel}"><views:QuarantineView/></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:ProcessMonitorViewModel}"><views:ProcessMonitorView/></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:ConnectionsViewModel}"><views:ConnectionsView/></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:ApplicationsViewModel}"><views:ApplicationsView/></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:FirewallViewModel}"><views:FirewallView/></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:RulesViewModel}"><views:RulesView/></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:UsbViewModel}"><views:UsbView/></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:StartupViewModel}"><views:StartupView/></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:HistoryViewModel}"><views:HistoryView/></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:StatisticsViewModel}"><views:StatisticsView/></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:SecurityCenterViewModel}"><views:SecurityCenterView/></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:SettingsViewModel}"><views:SettingsView/></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:DnsViewModel}"><views:DnsView/></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:WorldMapViewModel}"><views:WorldMapView/></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:WhatsNewViewModel}"><views:WhatsNewView/></DataTemplate>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
+
+

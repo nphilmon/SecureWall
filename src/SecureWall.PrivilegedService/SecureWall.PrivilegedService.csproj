@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>SecureWall.PrivilegedService</RootNamespace>
+    <AssemblyName>SecureWall.PrivilegedService</AssemblyName>
+    <PlatformTarget>x64</PlatformTarget>
+    <NoWarn>$(NoWarn);CA1416;CS8602</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SecureWall.Core\SecureWall.Core.csproj" />
+    <ProjectReference Include="..\SecureWall.Infrastructure\SecureWall.Infrastructure.csproj" />
+    <ProjectReference Include="..\SecureWall.Security\SecureWall.Security.csproj" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="8.0.1" />
+  </ItemGroup>
+</Project>

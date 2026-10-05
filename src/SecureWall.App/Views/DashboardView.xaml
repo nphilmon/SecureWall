@@ -1,0 +1,148 @@
+<UserControl x:Class="SecureWall.App.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctl="clr-namespace:SecureWall.App.Controls"
+             xmlns:enums="clr-namespace:SecureWall.Core.Enums;assembly=SecureWall.Core"
+             Style="{StaticResource PageStyle}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="28,6,16,24">
+            <ctl:PageHeader Title="{Binding Title}" Subtitle="{Binding Subtitle}"/>
+            <ctl:MessageBar Text="{Binding Message}" Level="{Binding MessageLevel}"/>
+
+            <!-- Sécurité générale -->
+            <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="Sécurité générale" Style="{StaticResource Muted}"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,6">
+                            <TextBlock Text="&#xEA18;" Style="{StaticResource Icon}" FontSize="30" Margin="0,0,12,0"
+                                       Foreground="{Binding Summary.StateLevel, Converter={StaticResource LevelFg}}"/>
+                            <TextBlock Text="{Binding Summary.StateText}" Style="{StaticResource H1}" VerticalAlignment="Center"
+                                       Foreground="{Binding Summary.StateLevel, Converter={StaticResource LevelFg}}"/>
+                        </StackPanel>
+                        <ItemsControl ItemsSource="{Binding Summary.Reasons}">
+                            <ItemsControl.ItemTemplate><DataTemplate><TextBlock Text="{Binding}" Style="{StaticResource Muted}" Margin="0,2,0,0"/></DataTemplate></ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Style="{StaticResource Muted}" Text="Tous les composants surveillés sont actifs et à jour." Margin="0,2,0,0"
+                                   Visibility="{Binding Summary.Reasons.Count, Converter={StaticResource EmptyToVis}}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <Button Content="Analyse rapide" Command="{Binding QuickScanCommand}" Style="{StaticResource PrimaryButton}" Margin="0,0,0,8"/>
+                        <Button Content="Centre de sécurité" Command="{Binding GoCommand}" CommandParameter="{x:Static enums:AppPage.SecurityCenter}" Margin="0"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <UniformGrid Columns="2">
+                <!-- Antivirus -->
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Content="Détails" Command="{Binding GoCommand}" CommandParameter="{x:Static enums:AppPage.Antivirus}" Margin="0" Padding="10,4"/>
+                            <TextBlock Text="Antivirus" Style="{StaticResource H2}"/>
+                        </DockPanel>
+                        <ctl:StatusBadge Text="{Binding AntivirusStatusText}" Level="{Binding AntivirusLevel}" Margin="0,8,0,10"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                            <TextBlock Text="Temps réel" Style="{StaticResource Muted}" Margin="0,3,18,3"/>
+                            <ctl:StatusBadge Grid.Column="1" Text="{Binding RealtimeText}" Level="{Binding RealtimeLevel}"/>
+                            <TextBlock Grid.Row="1" Text="Dernière analyse" Style="{StaticResource Muted}" Margin="0,3,18,3"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding LastScanText}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="2" Text="Menaces" Style="{StaticResource Muted}" Margin="0,3,18,3"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" VerticalAlignment="Center">
+                                <Run Text="{Binding Summary.TotalDetections, Mode=OneWay}"/><Run Text=" détectée(s) · "/><Run Text="{Binding Summary.ActiveThreats, Mode=OneWay}"/><Run Text=" active(s) · "/><Run Text="{Binding Summary.QuarantineCount, Mode=OneWay}"/><Run Text=" en quarantaine"/>
+                            </TextBlock>
+                            <TextBlock Grid.Row="3" Text="Signatures" Style="{StaticResource Muted}" Margin="0,3,18,3"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SignatureText}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="4" Text="Mises à jour" Style="{StaticResource Muted}" Margin="0,3,18,3"/>
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding SignatureDateText}" VerticalAlignment="Center"/>
+                        </Grid>
+                        <Button Content="Rechercher les mises à jour" Command="{Binding UpdateSignaturesCommand}" IsEnabled="{Binding Updating, Converter={StaticResource InvBool}}" HorizontalAlignment="Left" Margin="0,12,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Pare-feu -->
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Content="Détails" Command="{Binding GoCommand}" CommandParameter="{x:Static enums:AppPage.Firewall}" Margin="0" Padding="10,4"/>
+                            <TextBlock Text="Pare-feu" Style="{StaticResource H2}"/>
+                        </DockPanel>
+                        <ctl:StatusBadge Text="{Binding FirewallText}" Level="{Binding FirewallLevel}" Margin="0,8,0,10"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                            <TextBlock Text="Profil réseau" Style="{StaticResource Muted}" Margin="0,3,18,3"/>
+                            <TextBlock Grid.Column="1" Text="{Binding Summary.ActiveProfileName}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="1" Text="Règles actives" Style="{StaticResource Muted}" Margin="0,3,18,3"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" VerticalAlignment="Center"><Run Text="{Binding Summary.ActiveRules, Mode=OneWay}"/><Run Text=" sur "/><Run Text="{Binding Summary.TotalRules, Mode=OneWay}"/></TextBlock>
+                            <TextBlock Grid.Row="2" Text="Connexions bloquées" Style="{StaticResource Muted}" Margin="0,3,18,3"/>
+                            <StackPanel Grid.Row="2" Grid.Column="1">
+                                <TextBlock Text="{Binding BlockedText}" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding BlockedHint}" Style="{StaticResource Muted}" FontSize="11"/>
+                                <Button Content="Voir le détail" Command="{Binding GoBlockedCommand}" HorizontalAlignment="Left" Margin="0,6,0,0" Padding="10,3" AutomationProperties.Name="Voir le détail des connexions bloquées"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </UniformGrid>
+
+            <!-- Réseau -->
+            <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                <StackPanel>
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Content="Connexions" Command="{Binding GoCommand}" CommandParameter="{x:Static enums:AppPage.Connections}" Margin="0" Padding="10,4"/>
+                        <TextBlock Text="Réseau" Style="{StaticResource H2}"/>
+                    </DockPanel>
+                    <Grid Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Margin="0,0,16,0">
+                            <TextBlock Text="Débit entrant" Style="{StaticResource Muted}"/>
+                            <TextBlock Text="{Binding DownText}" Style="{StaticResource Big}"/>
+                            <ctl:Sparkline Values="{Binding DownHistory}" Stroke="{DynamicResource AccentBrush}" Height="46" Margin="0,6,0,0"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="0,0,16,0">
+                            <TextBlock Text="Débit sortant" Style="{StaticResource Muted}"/>
+                            <TextBlock Text="{Binding UpText}" Style="{StaticResource Big}"/>
+                            <ctl:Sparkline Values="{Binding UpHistory}" Stroke="{DynamicResource GoodBrush}" Height="46" Margin="0,6,0,0"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" MinWidth="170">
+                            <TextBlock Text="Connexions actives" Style="{StaticResource Muted}"/>
+                            <TextBlock Text="{Binding ActiveConnections}" Style="{StaticResource Big}"/>
+                            <TextBlock Text="Applications connectées" Style="{StaticResource Muted}" Margin="0,8,0,0"/>
+                            <TextBlock Text="{Binding ConnectedApps}" Style="{StaticResource Big}"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Alertes -->
+            <Border Style="{StaticResource Card}" Margin="0">
+                <StackPanel>
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Content="Historique" Command="{Binding GoCommand}" CommandParameter="{x:Static enums:AppPage.History}" Margin="0" Padding="10,4"/>
+                        <TextBlock Text="Alertes récentes" Style="{StaticResource H2}"/>
+                    </DockPanel>
+                    <TextBlock Text="Aucun événement enregistré pour le moment." Style="{StaticResource Muted}" Margin="0,10,0,0"
+                               Visibility="{Binding RecentEvents.Count, Converter={StaticResource EmptyToVis}}"/>
+                    <ItemsControl ItemsSource="{Binding RecentEvents}" Margin="0,8,0,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,4">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                    <Ellipse Width="8" Height="8" Fill="{Binding Level, Converter={StaticResource LevelFg}}" Margin="0,0,10,0"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Description}" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding TimeText}" Style="{StaticResource Muted}" Margin="12,0,0,0"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

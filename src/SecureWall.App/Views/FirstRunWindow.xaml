@@ -1,0 +1,69 @@
+<Window x:Class="SecureWall.App.Views.FirstRunWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Bienvenue dans SecureWall Security" Width="640" Height="540" ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen" Background="{DynamicResource BgBrush}"
+        FontFamily="Segoe UI Variable Text, Segoe UI" FontSize="13">
+    <Grid Margin="30,24,30,22">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <StackPanel>
+            <TextBlock Text="{Binding Progress}" Style="{StaticResource Muted}"/>
+            <TextBlock Text="{Binding StepTitle}" Style="{StaticResource H1}" Margin="0,2,0,0"/>
+            <ProgressBar Margin="0,10,0,16" Minimum="0" Maximum="7" Value="{Binding Step}"/>
+        </StackPanel>
+
+        <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0">
+            <Grid>
+                <StackPanel Visibility="{Binding IsWelcome, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="SecureWall Security centralise la sécurité de votre PC." Style="{StaticResource H2}" TextWrapping="Wrap"/>
+                    <TextBlock TextWrapping="Wrap" Margin="0,10,0,0" Text="Il s'appuie sur Microsoft Defender Antivirus et Windows Defender Firewall : il ne remplace pas ces composants, il les rend plus lisibles et plus faciles à piloter."/>
+                    <TextBlock TextWrapping="Wrap" Margin="0,10,0,0" Text="Tout reste sur cet ordinateur. Cet assistant ne modifie aucun paramètre de sécurité : il se contente de vérifier l'état de votre système."/>
+                </StackPanel>
+
+                <StackPanel Visibility="{Binding IsChecks, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="Vérification en cours…" Style="{StaticResource Muted}" Visibility="{Binding Loading, Converter={StaticResource BoolToVis}}"/>
+                    <ItemsControl ItemsSource="{Binding Lines}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,5">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                    <Ellipse Width="10" Height="10" Fill="{Binding Level, Converter={StaticResource LevelFg}}" Margin="0,5,12,0" VerticalAlignment="Top"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Text}" TextWrapping="Wrap"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+                <StackPanel Visibility="{Binding IsNotifications, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="Quelles notifications Windows souhaitez-vous recevoir ?" Style="{StaticResource H2}" Margin="0,0,0,8"/>
+                    <CheckBox Content="Activer les notifications" IsChecked="{Binding NotificationsEnabled}"/>
+                    <StackPanel Margin="26,0,0,0" IsEnabled="{Binding NotificationsEnabled}">
+                        <CheckBox Content="Menaces, suppressions et quarantaine" IsChecked="{Binding NotifyThreats}"/>
+                        <CheckBox Content="Fin d'analyse" IsChecked="{Binding NotifyScans}"/>
+                        <CheckBox Content="Pare-feu ou antivirus désactivé, changements de sécurité" IsChecked="{Binding NotifyFirewall}"/>
+                        <CheckBox Content="Périphérique USB détecté" IsChecked="{Binding NotifyUsb}"/>
+                    </StackPanel>
+                    <CheckBox Content="Proposer d'analyser les clés USB à l'insertion" IsChecked="{Binding UsbPrompt}" Margin="0,10,0,0"/>
+                </StackPanel>
+
+                <StackPanel Visibility="{Binding IsScan, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="Souhaitez-vous lancer une première analyse rapide ?" Style="{StaticResource H2}" TextWrapping="Wrap"/>
+                    <TextBlock TextWrapping="Wrap" Margin="0,10,0,10" Text="L'analyse est réalisée par Microsoft Defender et dure quelques minutes. Elle est facultative : vous pourrez la lancer plus tard depuis la page Analyses."/>
+                    <CheckBox Content="Lancer une analyse rapide à la fin de l'assistant" IsChecked="{Binding RunQuickScan}"/>
+                </StackPanel>
+
+                <StackPanel Visibility="{Binding IsDone, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="Configuration terminée" Style="{StaticResource H2}"/>
+                    <TextBlock TextWrapping="Wrap" Margin="0,10,0,0" Text="SecureWall surveille maintenant votre sécurité depuis la zone de notification. Vous pouvez modifier tous ces choix dans les Paramètres."/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <DockPanel Grid.Row="2" Margin="0,16,0,0" LastChildFill="False">
+            <Button DockPanel.Dock="Right" Content="Terminer" Command="{Binding FinishCommand}" Style="{StaticResource PrimaryButton}" Margin="8,0,0,0" Visibility="{Binding IsLast, Converter={StaticResource BoolToVis}}"/>
+            <Button DockPanel.Dock="Right" Content="Suivant" Command="{Binding NextCommand}" Style="{StaticResource PrimaryButton}" Margin="8,0,0,0" Visibility="{Binding IsLast, Converter={StaticResource InvBoolToVis}}" IsDefault="True"/>
+            <Button DockPanel.Dock="Right" Content="Retour" Command="{Binding BackCommand}" IsEnabled="{Binding CanBack}" Margin="0"/>
+        </DockPanel>
+    </Grid>
+</Window>

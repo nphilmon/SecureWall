@@ -1,0 +1,44 @@
+<UserControl x:Class="SecureWall.App.Views.WhatsNewView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctl="clr-namespace:SecureWall.App.Controls"
+             xmlns:vm="clr-namespace:SecureWall.App.ViewModels"
+             Style="{StaticResource PageStyle}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="28,6,16,24">
+            <ctl:PageHeader Title="{Binding Title}" Subtitle="{Binding Subtitle}"/>
+            <ItemsControl ItemsSource="{Binding Entries}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:WhatsNewEntry}">
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel>
+                                    <TextBlock DockPanel.Dock="Right" Text="{Binding Date}" Style="{StaticResource Muted}" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Header}" Style="{StaticResource H2}"/>
+                                </DockPanel>
+                                <TextBlock Text="{Binding Title}" Style="{StaticResource Muted}" Margin="0,2,0,10"/>
+                                <ItemsControl ItemsSource="{Binding Features}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="{x:Type vm:WhatsNewFeature}">
+                                            <Grid Margin="0,0,0,12">
+                                                <Grid.ColumnDefinitions><ColumnDefinition Width="92"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                                <ctl:StatusBadge Text="{Binding Category}" Level="{Binding Level}" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,2,0,0"/>
+                                                <StackPanel Grid.Column="1">
+                                                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                                                    <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                                    <Button Content="{Binding OpenLabel}" HorizontalAlignment="Left" Margin="0,8,0,0" Padding="10,3"
+                                                            Visibility="{Binding CanOpen, Converter={StaticResource BoolToVis}}"
+                                                            Command="{Binding DataContext.OpenCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

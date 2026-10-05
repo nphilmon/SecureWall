@@ -1,0 +1,17 @@
+global using System.Collections.ObjectModel;
+global using SecureWall.Core.DTOs;
+global using SecureWall.Core.Enums;
+global using SecureWall.Core.Interfaces;
+global using SecureWall.Core.Logic;
+global using SecureWall.Core.Models;
+global using SecureWall.Core.Validation;
+global using SecureWall.App.ViewModels;
+global using SecureWall.Security.Antivirus;
+global using SecureWall.Security.Firewall;
+global using SecureWall.Security.Network;
+global using System;
+global using System.IO;
+global using System.Linq;
+global using System.Collections.Generic;
+global using System.Threading;
+global using System.Threading.Tasks;
